@@ -16,10 +16,26 @@ export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand('music-analyzer.helloWorld', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Music Analyzer!');
+		vscode.window.showInformationMessage('Hello World from Music Analyzer Mr White!!');
+	});
+
+	const disposable2 = vscode.commands.registerCommand('music-analyzer.openPianoRoll', () => {
+		const panel = vscode.window.createWebviewPanel("piano-roll", "Piano Roll", vscode.ViewColumn.Active, {enableScripts:true, retainContextWhenHidden: true})
+		// Set the HTML content
+		panel.webview.html = `
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Piano Roll</title>
+		</head>
+		<body>
+			<h1>Hello World!</h1>
+		</body>
+		</html>`
 	});
 
 	context.subscriptions.push(disposable);
+	context.subscriptions.push(disposable2);
 }
 
 // This method is called when your extension is deactivated

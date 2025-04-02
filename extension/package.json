@@ -16,8 +16,34 @@
       {
         "command": "music-analyzer.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "music-analyzer.openPianoRoll",
+        "title" : "Open Piano Roll"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "music-composer",
+          "title": "Composer",
+          "icon" : "./media/keyboard-music.svg"
+        }
+      ]
+    },
+    "views": {
+      "music-composer" : [
+        {
+          "id" : "music-composer-view",
+          "name" : "Flow"
+        },
+        {
+          "id" : "music-composer-view2",
+          "name" : "Properties"
+        }
+        
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
