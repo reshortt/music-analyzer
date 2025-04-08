@@ -18,8 +18,8 @@
         "title": "Hello World"
       },
       {
-        "command": "music-analyzer.openPianoRoll",
-        "title" : "Open Piano Roll"
+        "command": "music-analyzer.openWebview",
+        "title" : "Hello Vega"
       }
     ],
     "viewsContainers": {
