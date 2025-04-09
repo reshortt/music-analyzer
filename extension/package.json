@@ -20,6 +20,10 @@
       {
         "command": "music-analyzer.openWebview",
         "title" : "Hello Vega"
+      },
+      {
+        "command": "music-analyzer.openCompositionEditor",
+        "title": "Open Composition Editor"
       }
     ],
     "viewsContainers": {

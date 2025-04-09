@@ -4,6 +4,7 @@ import { vscode } from "./utilities/vscode";
 
 function App() {
   const [message, setMessage] = useState("Hello from React!");
+  const [viewType, setViewType] = useState<string>()
 
   useEffect(() => {
     // Listen for messages from the extension
@@ -12,6 +13,9 @@ function App() {
       switch (message.command) {
         case "update":
           setMessage(message.text);
+          break;
+        case "setView":
+          setViewType(message.viewType)
           break;
       }
     };
@@ -35,7 +39,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>{message}</h1>
+      <h1>{viewType} : {message}</h1>
       <button onClick={handleButtonClick}>Send Message to Extensio
         n</button>
     </div>
