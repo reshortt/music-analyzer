@@ -143,7 +143,7 @@ export class CompositionEditorPanel {
             // Code that should run in response to the hello message command
             window.showInformationMessage(text);
             return;
-          case "setView":
+          case "webviewLoaded":
             webview.postMessage({
               command: "setView",
               viewType: "compositionEditor",
