@@ -35,11 +35,6 @@ export class HelloVegaPanel {
    
     // Set an event listener to listen for messages passed from the webview context
     this._setWebviewMessageListener(this._panel.webview);
-
-    this._panel.webview.postMessage({
-      command: "setView", viewType: "helloVega"
-    })
-
   }
 
   /**
@@ -147,6 +142,13 @@ export class HelloVegaPanel {
           case "hello":
             // Code that should run in response to the hello message command
             window.showInformationMessage(text);
+            return;
+          case "webviewLoaded":
+            // React app is now loaded and ready to receive messages
+            webview.postMessage({
+              command: "setView", 
+              viewType: "helloVega"
+            });
             return;
           // Add more switch case statements here as more webview message commands
           // are created within the webview context (i.e. inside media/main.js)

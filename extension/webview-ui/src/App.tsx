@@ -40,8 +40,7 @@ function App() {
   return (
     <div className="app">
       <h1>{viewType} : {message}</h1>
-      <button onClick={handleButtonClick}>Send Message to Extensio
-        n</button>
+      <button onClick={handleButtonClick}>Send Message to Extension</button>
     </div>
   );
 }
