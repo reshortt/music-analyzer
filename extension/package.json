@@ -24,6 +24,10 @@
       {
         "command": "music-analyzer.openCompositionEditor",
         "title": "Open Composition Editor"
+      },
+      {
+        "command": "music-analyzer.createProject",
+        "title": "Create Project"
       }
     ],
     "viewsContainers": {
@@ -38,14 +42,9 @@
     "views": {
       "music-composer" : [
         {
-          "id" : "music-composer-view",
-          "name" : "Flow"
-        },
-        {
-          "id" : "music-composer-view2",
-          "name" : "Properties"
+          "id": "music-analyzer.projectView",
+          "name": "Project"
         }
-        
       ]
     }
   },
