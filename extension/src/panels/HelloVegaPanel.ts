@@ -1,6 +1,7 @@
-import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from "vscode";
+import { Webview, WebviewPanel, window, Uri, ViewColumn } from "vscode";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
+import { VegaPanel } from "./VegaPanel";
 
 /**
  * This class manages the state and behavior of HelloWorld webview panels.
@@ -12,10 +13,8 @@ import { getNonce } from "../utilities/getNonce";
  * - Setting the HTML (and by proxy CSS/JavaScript) content of the webview panel
  * - Setting message listeners so data can be passed between the webview and extension
  */
-export class HelloVegaPanel {
+export class HelloVegaPanel extends VegaPanel {
   public static currentPanel: HelloVegaPanel | undefined;
-  private readonly _panel: WebviewPanel;
-  private _disposables: Disposable[] = [];
 
   /**
    * The HelloVegaPanel class private constructor (called only from the render method).
@@ -24,17 +23,7 @@ export class HelloVegaPanel {
    * @param extensionUri The URI of the directory containing the extension
    */
   private constructor(panel: WebviewPanel, extensionUri: Uri) {
-    this._panel = panel;
-
-    // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
-    // the panel or when the panel is closed programmatically)
-    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
-    // Set the HTML content for the webview panel
-    this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
-   
-    // Set an event listener to listen for messages passed from the webview context
-    this._setWebviewMessageListener(this._panel.webview);
+    super(panel, extensionUri);
   }
 
   /**
@@ -74,17 +63,12 @@ export class HelloVegaPanel {
    */
   public dispose() {
     HelloVegaPanel.currentPanel = undefined;
+    super.dispose();
+  }
 
-    // Dispose of the current webview panel
-    this._panel.dispose();
 
-    // Dispose of all disposables (i.e. commands) for the current webview panel
-    while (this._disposables.length) {
-      const disposable = this._disposables.pop();
-      if (disposable) {
-        disposable.dispose();
-      }
-    }
+  protected getViewType(): string {
+    return "compositionEditor"
   }
 
   /**
@@ -94,15 +78,14 @@ export class HelloVegaPanel {
    * are created and inserted into the webview HTML.
    *
    * @param webview A reference to the extension webview
-   * @param extensionUri The URI of the directory containing the extension
    * @returns A template string literal containing the HTML that should be
    * rendered within the webview panel
    */
-  private _getWebviewContent(webview: Webview, extensionUri: Uri) {
+  protected _getWebviewContent(webview: Webview): string {
     // The CSS file from the React build output
-    const stylesUri = getUri(webview, extensionUri, ["out", "webview-ui", "assets", "index.css"]);
+    const stylesUri = getUri(webview, this._extensionUri, ["out", "webview-ui", "assets", "index.css"]);
     // The JS file from the React build output
-    const scriptUri = getUri(webview, extensionUri, ["out", "webview-ui", "assets", "index.js"]);
+    const scriptUri = getUri(webview, this._extensionUri, ["out", "webview-ui", "assets", "index.js"]);
 
     const nonce = getNonce();
 
@@ -125,37 +108,7 @@ export class HelloVegaPanel {
     `;
   }
 
-  /**
-   * Sets up an event listener to listen for messages passed from the webview context and
-   * executes code based on the message that is recieved.
-   *
-   * @param webview A reference to the extension webview
-   * @param context A reference to the extension context
-   */
-  private _setWebviewMessageListener(webview: Webview) {
-    webview.onDidReceiveMessage(
-      (message: any) => {
-        const command = message.command;
-        const text = message.text;
 
-        switch (command) {
-          case "hello":
-            // Code that should run in response to the hello message command
-            window.showInformationMessage(text);
-            return;
-          case "webviewLoaded":
-            // React app is now loaded and ready to receive messages
-            webview.postMessage({
-              command: "setView", 
-              viewType: "helloVega"
-            });
-            return;
-          // Add more switch case statements here as more webview message commands
-          // are created within the webview context (i.e. inside media/main.js)
-        }
-      },
-      undefined,
-      this._disposables
-    );
-  }
+
+  
 }
