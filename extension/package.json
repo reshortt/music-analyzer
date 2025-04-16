@@ -13,12 +13,9 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+
       {
-        "command": "music-analyzer.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "music-analyzer.openWebview",
+        "command": "music-analyzer.helloVega",
         "title" : "Hello Vega"
       },
       {
