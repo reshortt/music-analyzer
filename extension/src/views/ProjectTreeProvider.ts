@@ -1,9 +1,18 @@
 import * as vscode from "vscode";
-import { CompositionProjectManager, CompositionProject } from "../managers/CompositionProjectManager";
+import {
+  CompositionProjectManager,
+  CompositionProject,
+} from "../managers/CompositionProjectManager";
 
-export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<ProjectTreeItem | undefined | null | void> = new vscode.EventEmitter<ProjectTreeItem | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<ProjectTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+export class ProjectTreeProvider
+  implements vscode.TreeDataProvider<ProjectTreeItem>
+{
+  private _onDidChangeTreeData: vscode.EventEmitter<
+    ProjectTreeItem | undefined | null | void
+  > = new vscode.EventEmitter<ProjectTreeItem | undefined | null | void>();
+  readonly onDidChangeTreeData: vscode.Event<
+    ProjectTreeItem | undefined | null | void
+  > = this._onDidChangeTreeData.event;
 
   constructor() {
     // No need to pass projectManager as a parameter, we'll use the singleton
@@ -30,7 +39,7 @@ export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeI
     // Get the project manager instance
     const projectManager = CompositionProjectManager.getInstance();
     const currentProject = projectManager.getCurrentProject();
-    
+
     if (currentProject) {
       // Project is loaded
       return [
@@ -41,7 +50,7 @@ export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeI
           {
             command: "music-analyzer.openProject",
             title: "Open Project",
-            arguments: []
+            arguments: [],
           }
         ),
         new ProjectTreeItem(
@@ -57,9 +66,9 @@ export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeI
           {
             command: "music-analyzer.createProject",
             title: "Create Project",
-            arguments: []
+            arguments: [],
           }
-        )
+        ),
       ];
     } else {
       // No project loaded
@@ -77,7 +86,7 @@ export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeI
           {
             command: "music-analyzer.createProject",
             title: "Create Project",
-            arguments: []
+            arguments: [],
           }
         ),
         new ProjectTreeItem(
@@ -87,9 +96,9 @@ export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeI
           {
             command: "music-analyzer.openProject",
             title: "Load Project",
-            arguments: []
+            arguments: [],
           }
-        )
+        ),
       ];
     }
   }
@@ -110,4 +119,4 @@ class ProjectTreeItem extends vscode.TreeItem {
       this.command = command;
     }
   }
-} 
+}
