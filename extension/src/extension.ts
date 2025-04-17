@@ -29,12 +29,9 @@ export function activate(context: vscode.ExtensionContext) {
     CompositionEditorPanel.render(context.extensionUri);
   });
 
-  // Webview-related commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand("music-analyzer.helloVega", () => {
-      HelloVegaPanel.render(context.extensionUri);
-    })
-  );
+  registerCommand(context, "music-analyzer.helloVega", () => {
+    HelloVegaPanel.render(context.extensionUri);
+  })
 }
 
-export function deactivate() {}
+export function deactivate() { }
