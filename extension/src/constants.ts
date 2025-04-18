@@ -46,7 +46,7 @@ export const state = {
   recentProjects: {
     get: (context: vscode.ExtensionContext): CompositionProject[] => {
       const recentProjects =
-        context.workspaceState.get<string>(RECENT_PROJECTS_KEY);
+        context.globalState.get<string>(RECENT_PROJECTS_KEY);
       return recentProjects ? JSON.parse(recentProjects) : [];
     },
     update: (context: vscode.ExtensionContext, project: CompositionProject) => {
@@ -62,10 +62,7 @@ export const state = {
       state.recentProjects.set(context, filteredProjects);
     },
     set: (context: vscode.ExtensionContext, projects: CompositionProject[]) => {
-      context.workspaceState.update(
-        RECENT_PROJECTS_KEY,
-        JSON.stringify(projects)
-      );
+      context.globalState.update(RECENT_PROJECTS_KEY, JSON.stringify(projects));
     },
   },
 };
