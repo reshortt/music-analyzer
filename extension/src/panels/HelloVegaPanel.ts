@@ -42,7 +42,7 @@ export class HelloVegaPanel extends VegaPanel {
         // Panel view type
         "showHelloWorld",
         // Panel title
-        "Hello World",
+        "Hello Vega",
         // The editor column the panel should be displayed in
         ViewColumn.One,
         // Extra panel configurations
@@ -68,7 +68,7 @@ export class HelloVegaPanel extends VegaPanel {
 
 
   protected getViewType(): string {
-    return "compositionEditor"
+    return "helloVega"
   }
 
   /**

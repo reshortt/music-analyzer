@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { vscode } from "./utilities/vscode";
+import "@vscode-elements/elements/dist/bundled.js";
+import CompositionEditorPanel from "./panels/CompositionEditorPanel";
+import HelloVegaPanel from "./panels/HelloVegaPanel";
 
 function App() {
-  const [message, setMessage] = useState("Hello from React!");
   const [viewType, setViewType] = useState<string>()
 
   useEffect(() => {
@@ -11,9 +13,6 @@ function App() {
     const messageListener = (event: MessageEvent) => {
       const message = event.data;
       switch (message.command) {
-        case "update":
-          setMessage(message.text);
-          break;
         case "setView":
           setViewType(message.viewType)
           break;
@@ -30,19 +29,18 @@ function App() {
     return () => window.removeEventListener("message", messageListener);
   }, []);
 
-  const handleButtonClick = () => {
-    vscode.postMessage({
-      command: "hello",
-      text: "Hello from React to Extension!",
-    });
-  };
-
-  return (
-    <div className="app">
-      <h1>{viewType} : {message}</h1>
-      <button onClick={handleButtonClick}>Send Message to Extension</button>
-    </div>
-  );
+  if (viewType == "compositionEditor") {
+    return <CompositionEditorPanel />
+  }
+  else if (viewType == "helloVega") {
+    return <HelloVegaPanel />
+  }
+  else if (viewType == undefined) {
+    return <p>Loading...</p>
+  }
+  else {
+    return <p>INVALID TYPE {viewType} </p>
+  }
 }
 
 export default App;
