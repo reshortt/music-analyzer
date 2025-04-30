@@ -1,13 +1,20 @@
 import { Disposable, Webview, window, WebviewPanel, Uri } from "vscode";
+import { getNonce } from "../utilities/nonce";
+import { getUri } from "../utilities/uri";
 
+/**
+ * Base class for all Vega panels. Uses the same react build.
+ */
 export abstract class VegaPanel {
   protected readonly _panel: WebviewPanel;
   protected readonly _extensionUri: Uri;
   protected _disposables: Disposable[] = [];
+  protected _viewType: string;
 
-  constructor(panel: WebviewPanel, extensionUri: Uri) {
+  constructor(panel: WebviewPanel, extensionUri: Uri, viewType: string) {
     this._panel = panel;
     this._extensionUri = extensionUri;
+    this._viewType = viewType;
 
     // Set an event listener to listen for when the panel is disposed
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -56,8 +63,8 @@ export abstract class VegaPanel {
           case "webviewLoaded":
             // React app is now loaded and ready to receive messages
             webview.postMessage({
-              command: "setView", 
-              viewType: this.getViewType()
+              command: "setView",
+              viewType: this._viewType,
             });
             return;
           // Add more switch case statements here as more webview message commands
@@ -68,10 +75,41 @@ export abstract class VegaPanel {
       this._disposables
     );
   }
-  /**
-   * Abstract method to define and return the HTML content for the webview panel.
-   */
-  protected abstract getViewType(): string;
-  
-  protected abstract _getWebviewContent(webview: Webview): string;
+
+  protected _getWebviewContent(webview: Webview): string {
+    // The CSS file from the React build output
+    const stylesUri = getUri(webview, this._extensionUri, [
+      "out",
+      "webview",
+      "assets",
+      "index.css",
+    ]);
+    // The JS file from the React build output
+    const scriptUri = getUri(webview, this._extensionUri, [
+      "out",
+      "webview",
+      "assets",
+      "index.js",
+    ]);
+
+    const nonce = getNonce();
+
+    // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
+    return /*html*/ `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+          <link rel="stylesheet" type="text/css" href="${stylesUri}">
+          <title>Hello Composition Editor</title>
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+        </body>
+      </html>
+    `;
+  }
 }

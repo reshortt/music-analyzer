@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 import { vscode } from "./utilities/vscode";
 import "@vscode-elements/elements/dist/bundled.js";
+import "@vscode-elements/elements/dist/main.d.ts";
 import CompositionEditorPanel from "./panels/CompositionEditorPanel";
 import HelloVegaPanel from "./panels/HelloVegaPanel";
+import ActivityBarPanel from "./panels/ActivityBarPanel";
 
 function App() {
-  const [viewType, setViewType] = useState<string>()
+  const [viewType, setViewType] = useState<string>();
 
   useEffect(() => {
     // Listen for messages from the extension
@@ -14,7 +15,7 @@ function App() {
       const message = event.data;
       switch (message.command) {
         case "setView":
-          setViewType(message.viewType)
+          setViewType(message.viewType);
           break;
       }
     };
@@ -29,18 +30,21 @@ function App() {
     return () => window.removeEventListener("message", messageListener);
   }, []);
 
-  if (viewType == "compositionEditor") {
-    return <CompositionEditorPanel />
+  if (viewType === undefined) {
+    return <p>Loading...</p>;
   }
-  else if (viewType == "helloVega") {
-    return <HelloVegaPanel />
+
+  if (viewType === "compositionEditor") {
+    return <CompositionEditorPanel />;
   }
-  else if (viewType == undefined) {
-    return <p>Loading...</p>
+  if (viewType === "helloVega") {
+    return <HelloVegaPanel />;
   }
-  else {
-    return <p>INVALID TYPE {viewType} </p>
+  if (viewType === "activityBar") {
+    return <ActivityBarPanel />;
   }
+
+  return <p>INVALID TYPE {viewType} </p>;
 }
 
 export default App;

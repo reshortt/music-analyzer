@@ -6,7 +6,7 @@ import {
   registerCommand,
   showErrorMessage,
   showMessage,
-} from "../utilities/commands";
+} from "../utilities/vs-utils";
 
 type CompositionProject = {
   name: string;
@@ -99,7 +99,10 @@ class CompositionProjectManager {
       placeHolder: "My Composition Project",
     });
 
-    if (!name) return; // User cancelled
+    // User cancelled
+    if (!name) {
+      return;
+    }
 
     let location: string | undefined;
 
@@ -155,7 +158,10 @@ class CompositionProjectManager {
       placeHolder: "Select project to open",
     });
 
-    if (!selection) return; // User cancelled
+    // User cancelled
+    if (!selection) {
+      return;
+    }
 
     if (selection.label === "Browse...") {
       const fileUri = await vscode.window.showOpenDialog({
@@ -390,6 +396,10 @@ class CompositionProjectManager {
       );
     }
     return CompositionProjectManager._instance;
+  }
+
+  public static initialize(context: vscode.ExtensionContext): void {
+    this.getInstance(context);
   }
 }
 

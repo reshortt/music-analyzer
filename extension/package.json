@@ -13,10 +13,9 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-
       {
         "command": "music-analyzer.helloVega",
-        "title" : "Hello Vega"
+        "title": "Hello Vega"
       },
       {
         "command": "music-analyzer.openCompositionEditor",
@@ -32,15 +31,22 @@
         {
           "id": "music-composer",
           "title": "Composer",
-          "icon" : "./media/keyboard-music.svg"
+          "icon": "./media/keyboard-music.svg"
         }
       ]
     },
     "views": {
-      "music-composer" : [
+      "music-composer": [
         {
           "id": "music-analyzer.projectView",
-          "name": "Project"
+          "name": "Project",
+          "type": "webview",
+          "contextualTitle": "Music Analyzer Project"
+        },
+        {
+          "id": "music-analyzer.sourcesTree",
+          "name": "Sources",
+          "contextualTitle": "Music Analyzer Sources"
         }
       ]
     }

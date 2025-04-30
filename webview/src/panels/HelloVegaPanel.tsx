@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import {vscode} from "../utilities/vscode.ts"
+import { useEffect, useState } from "react";
+import { vscode } from "../utilities/vscode";
 
-const CompositionEditorPanel: React.FC = () => {
+export default function HelloVegaPanel() {
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
@@ -25,11 +25,11 @@ const CompositionEditorPanel: React.FC = () => {
 
   return (
     <div>
-      <h1>Composition Editor Panel</h1>
+      <h1>Hello Vega Panel</h1>
       <p>{message}</p>
-      <button onClick={sendMessage}>Send Message to Extension</button>
+      <vscode-button onClick={sendMessage}>
+        Send Message to Extension
+      </vscode-button>
     </div>
   );
-};
-
-export default CompositionEditorPanel;
+}

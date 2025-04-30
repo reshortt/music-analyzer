@@ -6,7 +6,7 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: path.resolve(__dirname, "..", "out", "webview-ui"),
+    outDir: path.resolve(__dirname, "..", "extension", "out", "webview"),
     emptyOutDir: true,
     sourcemap: true,
     assetsDir: "assets",
