@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { CompositionProjectManager } from "../managers/CompositionProjectManager";
 import { getNonce } from "../utilities/nonce";
+import { COMMANDS } from "../constants";
 
 export class ProjectViewProvider implements vscode.WebviewViewProvider {
   private _viewId: string;
@@ -49,9 +50,16 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
             // Set the view type when the webview is loaded
             webviewView.webview.postMessage({
               command: "setView",
-              viewType: "activityBar",
+              viewType: "projectView",
             });
             break;
+          case "createNewProject":
+            vscode.commands.executeCommand(COMMANDS.CREATE_PROJECT.id);
+            break;
+          case "openProject":
+            vscode.commands.executeCommand(COMMANDS.OPEN_PROJECT.id);
+            break;
+            
         }
       },
       undefined,

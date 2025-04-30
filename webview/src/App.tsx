@@ -4,7 +4,7 @@ import "@vscode-elements/elements/dist/bundled.js";
 import "@vscode-elements/elements/dist/main.d.ts";
 import CompositionEditorPanel from "./panels/CompositionEditorPanel";
 import HelloVegaPanel from "./panels/HelloVegaPanel";
-import ActivityBarPanel from "./panels/ActivityBarPanel";
+import ProjectViewPanel from "./panels/ProjectViewPanel";
 
 function App() {
   const [viewType, setViewType] = useState<string>();
@@ -40,8 +40,8 @@ function App() {
   if (viewType === "helloVega") {
     return <HelloVegaPanel />;
   }
-  if (viewType === "activityBar") {
-    return <ActivityBarPanel />;
+  if (viewType === "projectView") {
+    return <ProjectViewPanel />;
   }
 
   return <p>INVALID TYPE {viewType} </p>;

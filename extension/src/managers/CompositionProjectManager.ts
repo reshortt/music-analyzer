@@ -7,13 +7,7 @@ import {
   showErrorMessage,
   showMessage,
 } from "../utilities/vs-utils";
-
-type CompositionProject = {
-  name: string;
-  location: string;
-  created?: string;
-  lastOpened?: string;
-};
+import type { CompositionProject } from "@music-analyzer/shared";
 
 const projectEvents = new vscode.EventEmitter<{
   type: "created" | "loaded" | "closed" | "refreshed";

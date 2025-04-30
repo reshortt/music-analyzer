@@ -59,6 +59,9 @@
     "lint": "eslint src",
     "test": "vscode-test"
   },
+  "dependencies": {
+    "@music-analyzer/shared": "link:../shared"
+  },
   "devDependencies": {
     "@types/vscode": "^1.98.0",
     "@types/mocha": "^10.0.10",
