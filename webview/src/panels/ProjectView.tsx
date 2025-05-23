@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { vscode } from "../utilities/vscode";
 import type { CompositionProject } from "@music-analyzer/shared";
 
-export default function ProjectViewPanel() {
+export default function ProjectView() {
   const [project, setProject] = useState<CompositionProject | null>(null);
 
   useEffect(() => {
