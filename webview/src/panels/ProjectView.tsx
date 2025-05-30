@@ -6,6 +6,10 @@ export default function ProjectView() {
   const [project, setProject] = useState<CompositionProject | null>(null);
 
   useEffect(() => {
+    vscode.postMessage({ command: "webviewViewLoaded" });
+  }, []);
+
+  useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.command === "projectStateChanged") {
         setProject(event.data.payload.project);
@@ -38,28 +42,26 @@ export default function ProjectView() {
         </div>
       ) : (
         <>
-        <p className="text-center">No project loaded</p>
+          <p className="text-center">No project loaded</p>
 
-              <div className="flex flex-col gap-2">
-        <vscode-button
-          onClick={() => {
-            vscode.postMessage({ command: "openProject" });
-          }}
-        >
-          Open Project
-        </vscode-button>
-        <vscode-button
-          onClick={() => {
-            vscode.postMessage({ command: "createNewProject" });
-          }}
-        >
-          Create New Project
-        </vscode-button>
-       
-      </div>
-       </>
+          <div className="flex flex-col gap-2">
+            <vscode-button
+              onClick={() => {
+                vscode.postMessage({ command: "openProject" });
+              }}
+            >
+              Open Project
+            </vscode-button>
+            <vscode-button
+              onClick={() => {
+                vscode.postMessage({ command: "createNewProject" });
+              }}
+            >
+              Create New Project
+            </vscode-button>
+          </div>
+        </>
       )}
-
     </div>
   );
 }
