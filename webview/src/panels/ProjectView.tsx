@@ -23,13 +23,24 @@ export default function ProjectView() {
     <div className="flex flex-col gap-2">
       {project ? (
         <div>
-          <h2>Current Project</h2>
-          <pre>{JSON.stringify(project, null, 2)}</pre>
+          <h2 className="underline"> Current Project</h2>
+
+          <div className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1">
+            <span className="font-medium ">Project:</span>
+            <span>{project.name}</span>
+            <span className="font-medium ">Location:</span>
+            <span>{project.location}</span>
+            <span className="font-medium ">Created:</span>
+            <span>{project.created ?? "None"}</span>
+            <span className="font-medium ">Last Opened:</span>
+            <span>{project.lastOpened ? project.lastOpened : "None"}</span>
+          </div>
         </div>
       ) : (
+        <>
         <p className="text-center">No project loaded</p>
-      )}
-      <div className="flex flex-col gap-2">
+
+              <div className="flex flex-col gap-2">
         <vscode-button
           onClick={() => {
             vscode.postMessage({ command: "openProject" });
@@ -44,7 +55,11 @@ export default function ProjectView() {
         >
           Create New Project
         </vscode-button>
+       
       </div>
+       </>
+      )}
+
     </div>
   );
 }
