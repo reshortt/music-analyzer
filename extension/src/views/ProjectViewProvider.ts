@@ -52,6 +52,7 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
               command: "setView",
               viewType: "projectView",
             });
+            this._updateWebview()
             break;
           case "createNewProject":
             vscode.commands.executeCommand(COMMANDS.CREATE_PROJECT.id);

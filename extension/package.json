@@ -24,6 +24,10 @@
       {
         "command": "music-analyzer.createProject",
         "title": "Create Project"
+      },
+      {
+        "command": "music-analyzer.closeProject",
+        "title": "Close Project"  
       }
     ],
     "viewsContainers": {
@@ -47,6 +51,18 @@
           "id": "music-analyzer.sourcesTree",
           "name": "Sources",
           "contextualTitle": "Music Analyzer Sources"
+        }
+      ]
+    }, 
+    "menus" : {
+      "view/title" : [
+        {
+          "command": "music-analyzer.createProject",
+          "when" : "view == music-analyzer.projectView"
+        },
+        {
+          "command": "music-analyzer.closeProject",
+          "when": "view == music-analyzer.projectView && music-analyzer.isProjectOpen" 
         }
       ]
     }

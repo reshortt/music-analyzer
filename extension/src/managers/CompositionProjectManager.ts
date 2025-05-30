@@ -34,6 +34,13 @@ class CompositionProjectManager {
 
     this.context = context;
 
+    // listen for project open/close events
+    vscode.commands.executeCommand('setContext', 'music-analyzer.isProjectOpen', false);
+
+    CompositionProjectManager.onProjectChanged((sentEvent) => {
+      vscode.commands.executeCommand('setContext', 'music-analyzer.isProjectOpen', !!sentEvent.project);
+    })
+
     // Initialize current project from workspace state if available
     const savedProject = state.savedProject.get(context);
     if (savedProject?.location) {
