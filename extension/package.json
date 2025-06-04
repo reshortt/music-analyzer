@@ -15,19 +15,23 @@
     "commands": [
       {
         "command": "music-analyzer.helloVega",
-        "title": "Hello Vega"
+        "title": "Hello Vega",
+        "category": "Music Analyzer"
       },
       {
         "command": "music-analyzer.openCompositionEditor",
-        "title": "Open Composition Editor"
+        "title": "Open Composition Editor",
+        "category": "Music Analyzer"
       },
       {
         "command": "music-analyzer.createProject",
-        "title": "Create Project"
+        "title": "Create Project",
+        "category": "Music Analyzer"
       },
       {
         "command": "music-analyzer.closeProject",
-        "title": "Close Project"  
+        "title": "Close Project",
+        "category": "Music Analyzer"  
       }
     ],
     "viewsContainers": {

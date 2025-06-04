@@ -23,45 +23,34 @@ export default function ProjectView() {
     };
   }, []);
 
-  return (
+  return (project ? <YesProjectView project={project} /> : <NoProjectView />)
+}
+
+function YesProjectView(props: { project: CompositionProject }) {
+  const { project } = props;
+  return <vscode-tree id="tree-basic-example">{project.name}</vscode-tree>
+}
+
+function NoProjectView() {
+  return <div className="flex flex-col gap-2">
+
+    <p className="text-center">No project loaded</p>
+
     <div className="flex flex-col gap-2">
-      {project ? (
-        <div>
-          <h2 className="underline"> Current Project</h2>
-
-          <div className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1">
-            <span className="font-medium ">Project:</span>
-            <span>{project.name}</span>
-            <span className="font-medium ">Location:</span>
-            <span>{project.location}</span>
-            <span className="font-medium ">Created:</span>
-            <span>{project.created ?? "None"}</span>
-            <span className="font-medium ">Last Opened:</span>
-            <span>{project.lastOpened ? project.lastOpened : "None"}</span>
-          </div>
-        </div>
-      ) : (
-        <>
-          <p className="text-center">No project loaded</p>
-
-          <div className="flex flex-col gap-2">
-            <vscode-button
-              onClick={() => {
-                vscode.postMessage({ command: "openProject" });
-              }}
-            >
-              Open Project
-            </vscode-button>
-            <vscode-button
-              onClick={() => {
-                vscode.postMessage({ command: "createNewProject" });
-              }}
-            >
-              Create New Project
-            </vscode-button>
-          </div>
-        </>
-      )}
+      <vscode-button
+        onClick={() => {
+          vscode.postMessage({ command: "openProject" });
+        }}
+      >
+        Open Project
+      </vscode-button>
+      <vscode-button
+        onClick={() => {
+          vscode.postMessage({ command: "createNewProject" });
+        }}
+      >
+        Create New Project
+      </vscode-button>
     </div>
-  );
+  </div>
 }
