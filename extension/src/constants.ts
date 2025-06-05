@@ -19,6 +19,10 @@ export const COMMANDS = {
     id: "music-analyzer.refreshProject",
     title: "Refresh Project",
   },
+  OPEN_COMPOSITION_EDITOR: {
+    id: "music-analyzer.openCompositionEditor",
+    title: "Open Composition Editor",
+  }
 };
 
 // keys

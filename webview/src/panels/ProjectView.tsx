@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { vscode } from "../utilities/vscode";
 import type { CompositionProject } from "@music-analyzer/shared";
+import { Tree } from "antd";
+
 
 export default function ProjectView() {
   const [project, setProject] = useState<CompositionProject | null>(null);
@@ -28,7 +30,23 @@ export default function ProjectView() {
 
 function YesProjectView(props: { project: CompositionProject }) {
   const { project } = props;
-  return <vscode-tree id="tree-basic-example">{project.name}</vscode-tree>
+  const treeData = [
+    {
+      title: (
+        <span
+          className="font-bold cursor-pointer"
+          onClick={() => {
+            vscode.postMessage({ command: "openCompositionEditor" });
+          }}
+        >
+          EDITOR
+        </span>
+      ),
+      key: "0-0",
+    },
+    { title: <span className="font-bold">OUTPUT</span>, key: "0-1" },
+  ];
+  return <Tree treeData={treeData} />;
 }
 
 function NoProjectView() {

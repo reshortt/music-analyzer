@@ -62,6 +62,9 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
           case "openProject":
             vscode.commands.executeCommand(COMMANDS.OPEN_PROJECT.id);
             break;
+          case "openCompositionEditor":
+            vscode.commands.executeCommand(COMMANDS.OPEN_COMPOSITION_EDITOR.id);
+            break;
         }
       },
       undefined,
@@ -80,6 +83,8 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
           project: currentProject,
         },
       });
+
+      this._view.title = currentProject?.name || "Untitled Project"
     }
   }
 

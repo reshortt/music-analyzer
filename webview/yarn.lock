@@ -1072,6 +1072,18 @@ detect-libc@^2.0.3:
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.4.tgz#f04715b8ba815e53b4d8109655b6508a6865a7e8"
   integrity sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==
 
+dockview-core@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.npmjs.org/dockview-core/-/dockview-core-4.3.0.tgz#0fb44ddecd925f0edc13d251669953cfc63731d2"
+  integrity sha512-0yALheanGzibIl2VFvD8XTUFBRIlnq6S6PIhwtxW7W4IeHX207ZanSmsjrKB6L761ztBY/6TQeddppmF302c5g==
+
+dockview@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.npmjs.org/dockview/-/dockview-4.3.0.tgz#d89b256bdac960acd0939221c8411c4e6316a378"
+  integrity sha512-SULWNy5A5j/C3iwTUSEN659YSdGERL8V34ktprygDu+XQ3yq82aLc52R5C0i3fYmimQOvQCCn1JvMg54ai9N6w==
+  dependencies:
+    dockview-core "^4.3.0"
+
 enhanced-resolve@^5.18.1:
   version "5.18.1"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.18.1.tgz#728ab082f8b7b6836de51f1637aab5d3b9568faf"
