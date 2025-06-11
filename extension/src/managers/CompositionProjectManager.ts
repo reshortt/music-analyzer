@@ -1,9 +1,10 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { COMMANDS, state } from "../constants";
+import { COMMANDS, CONTEXT, state } from "../constants";
 import {
   registerCommand,
+  setContext,
   showErrorMessage,
   showMessage,
 } from "../utilities/vs-utils";
@@ -34,12 +35,11 @@ class CompositionProjectManager {
 
     this.context = context;
 
-    // listen for project open/close events
-    vscode.commands.executeCommand('setContext', 'music-analyzer.isProjectOpen', false);
-
-    CompositionProjectManager.onProjectChanged((sentEvent) => {
-      vscode.commands.executeCommand('setContext', 'music-analyzer.isProjectOpen', !!sentEvent.project);
-    })
+    // initialize the context and listen for project open/close events
+    setContext(CONTEXT.IS_PROJECT_OPEN, false);
+    CompositionProjectManager.onProjectChanged(({ project }) => {
+      setContext(CONTEXT.IS_PROJECT_OPEN, !!project);
+    });
 
     // Initialize current project from workspace state if available
     const savedProject = state.savedProject.get(context);

@@ -17,3 +17,7 @@ export function showMessage(message: string) {
 export function showErrorMessage(message: string) {
   vscode.window.showErrorMessage(message);
 }
+
+export function setContext(context: string, value: boolean) {
+  vscode.commands.executeCommand("setContext", context, value);
+}

@@ -3,7 +3,6 @@ import { vscode } from "../utilities/vscode";
 import type { CompositionProject } from "@music-analyzer/shared";
 import { Tree } from "antd";
 
-
 export default function ProjectView() {
   const [project, setProject] = useState<CompositionProject | null>(null);
 
@@ -25,7 +24,7 @@ export default function ProjectView() {
     };
   }, []);
 
-  return (project ? <YesProjectView project={project} /> : <NoProjectView />)
+  return project ? <YesProjectView project={project} /> : <NoProjectView />;
 }
 
 function YesProjectView(props: { project: CompositionProject }) {
@@ -39,36 +38,37 @@ function YesProjectView(props: { project: CompositionProject }) {
             vscode.postMessage({ command: "openCompositionEditor" });
           }}
         >
-          EDITOR
+          EDITOR!!
         </span>
       ),
       key: "0-0",
     },
     { title: <span className="font-bold">OUTPUT</span>, key: "0-1" },
   ];
-  return <Tree treeData={treeData} />;
+  return <Tree treeData={treeData} className="px-4" />;
 }
 
 function NoProjectView() {
-  return <div className="flex flex-col gap-2">
+  return (
+    <div className="flex flex-col gap-2 px-4">
+      <p className="text-center">No project loaded</p>
 
-    <p className="text-center">No project loaded</p>
-
-    <div className="flex flex-col gap-2">
-      <vscode-button
-        onClick={() => {
-          vscode.postMessage({ command: "openProject" });
-        }}
-      >
-        Open Project
-      </vscode-button>
-      <vscode-button
-        onClick={() => {
-          vscode.postMessage({ command: "createNewProject" });
-        }}
-      >
-        Create New Project
-      </vscode-button>
+      <div className="flex flex-col gap-2">
+        <vscode-button
+          onClick={() => {
+            vscode.postMessage({ command: "openProject" });
+          }}
+        >
+          Open Project
+        </vscode-button>
+        <vscode-button
+          onClick={() => {
+            vscode.postMessage({ command: "createNewProject" });
+          }}
+        >
+          Create New Project
+        </vscode-button>
+      </div>
     </div>
-  </div>
+  );
 }

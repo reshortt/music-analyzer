@@ -1,7 +1,15 @@
 import * as vscode from "vscode";
 import { CompositionProject } from "./managers/CompositionProjectManager";
 
-// commands
+export const VIEWS = {
+  PROJECT_VIEW: "music-analyzer.projectView",
+  SOURCES_TREE: "music-analyzer.sourcesTree",
+};
+
+export const CONTEXT = {
+  IS_PROJECT_OPEN: "music-analyzer.isProjectOpen",
+};
+
 export const COMMANDS = {
   CREATE_PROJECT: {
     id: "music-analyzer.createProject",

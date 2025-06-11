@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { CompositionProjectManager } from "../managers/CompositionProjectManager";
-import { getNonce } from "../utilities/nonce";
 import { COMMANDS } from "../constants";
+import { getHtmlForWebview } from "../utilities/webview";
 
 export class ProjectViewProvider implements vscode.WebviewViewProvider {
   private _viewId: string;
@@ -12,9 +12,10 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
   constructor(context: vscode.ExtensionContext, viewId: string) {
     this._context = context;
     this._viewId = viewId;
+
     // Subscribe to project changes
     this._disposables.push(
-      CompositionProjectManager.onProjectChanged((event) => {
+      CompositionProjectManager.onProjectChanged(() => {
         this._updateWebview();
       })
     );
@@ -40,7 +41,10 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
       ],
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = getHtmlForWebview(
+      webviewView.webview,
+      this._context.extensionUri
+    );
 
     // Handle messages from the webview
     webviewView.webview.onDidReceiveMessage(
@@ -73,60 +77,20 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _updateWebview() {
-    if (this._view) {
-      const projectManager = CompositionProjectManager.getInstance();
-      const currentProject = projectManager.getCurrentProject();
-
-      this._view.webview.postMessage({
-        command: "projectStateChanged",
-        payload: {
-          project: currentProject,
-        },
-      });
-
-      this._view.title = currentProject?.name || "Untitled Project"
+    if (!this._view) {
+      return;
     }
-  }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
-    // Get the local path to main script run in the webview
-    const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._context.extensionUri,
-        "out",
-        "webview",
-        "assets",
-        "index.js"
-      )
-    );
+    const projectManager = CompositionProjectManager.getInstance();
+    const currentProject = projectManager.getCurrentProject();
 
-    // Get the local path to main style run in the webview
-    const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._context.extensionUri,
-        "out",
-        "webview",
-        "assets",
-        "index.css"
-      )
-    );
+    this._view.webview.postMessage({
+      command: "projectStateChanged",
+      payload: {
+        project: currentProject,
+      },
+    });
 
-    // Use a nonce to only allow specific scripts to be run
-    const nonce = getNonce();
-
-    return `<!DOCTYPE html>
-      <html lang="en" style="width: 100%; overflow-x: hidden;">
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-          <link href="${styleUri}" rel="stylesheet" />
-          <title>Composition View</title>
-        </head>
-        <body style="width: 100%; overflow-x: hidden; padding: 0 !important;">
-          <div id="root" style="width: 100%; overflow-x: hidden;"></div>
-          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
-        </body>
-      </html>`;
+    this._view.title = currentProject?.name || "Untitled Project";
   }
 }

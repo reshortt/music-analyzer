@@ -1,6 +1,5 @@
 import { Disposable, Webview, window, WebviewPanel, Uri } from "vscode";
-import { getNonce } from "../utilities/nonce";
-import { getUri } from "../utilities/uri";
+import { getHtmlForWebview } from "../utilities/webview";
 
 /**
  * Base class for all Vega panels. Uses the same react build.
@@ -20,7 +19,10 @@ export abstract class VegaPanel {
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
     // Set the HTML content for the webview panel
-    this._panel.webview.html = this._getWebviewContent(this._panel.webview);
+    this._panel.webview.html = getHtmlForWebview(
+      this._panel.webview,
+      extensionUri
+    );
 
     // Set an event listener to listen for messages passed from the webview context
     this._setWebviewMessageListener(this._panel.webview);
@@ -74,42 +76,5 @@ export abstract class VegaPanel {
       undefined,
       this._disposables
     );
-  }
-
-  protected _getWebviewContent(webview: Webview): string {
-    // The CSS file from the React build output
-    const stylesUri = getUri(webview, this._extensionUri, [
-      "out",
-      "webview",
-      "assets",
-      "index.css",
-    ]);
-    // The JS file from the React build output
-    const scriptUri = getUri(webview, this._extensionUri, [
-      "out",
-      "webview",
-      "assets",
-      "index.js",
-    ]);
-
-    const nonce = getNonce();
-
-    // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
-    return /*html*/ `
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-          <link rel="stylesheet" type="text/css" href="${stylesUri}">
-          <title>Hello Composition Editor</title>
-        </head>
-        <body>
-          <div id="root"></div>
-          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
-        </body>
-      </html>
-    `;
   }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "music-analyzer",
+  "version": "1.0.0",
+  "scripts": {
+    "watch": "concurrently \"yarn webview:watch\" \"yarn extension:watch\" \"yarn server:dev\"",
+    "webview:watch": "yarn --cwd webview watch",
+    "extension:watch": "yarn --cwd extension watch",
+    "server:dev": "yarn --cwd server dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

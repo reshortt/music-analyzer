@@ -3,7 +3,6 @@ import { vscode } from "./utilities/vscode";
 import "@vscode-elements/elements/dist/bundled.js";
 import "@vscode-elements/elements/dist/main.d.ts";
 import CompositionEditorPanel from "./panels/CompositionEditorPanel";
-import HelloVegaPanel from "./panels/HelloVegaPanel";
 import ProjectView from "./panels/ProjectView";
 
 function App() {
@@ -37,9 +36,7 @@ function App() {
   if (viewType === "compositionEditor") {
     return <CompositionEditorPanel />;
   }
-  if (viewType === "helloVega") {
-    return <HelloVegaPanel />;
-  }
+
   if (viewType === "projectView") {
     return <ProjectView />;
   }
