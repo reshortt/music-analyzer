@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CompositionProject } from "./managers/CompositionProjectManager";
+import { CompositionProject } from "./stores/ProjectStore";
 
 export const VIEWS = {
   PROJECT_VIEW: "music-analyzer.projectView",
@@ -23,14 +23,14 @@ export const COMMANDS = {
     id: "music-analyzer.closeProject",
     title: "Close Project",
   },
-  REFRESH_PROJECT: {
-    id: "music-analyzer.refreshProject",
-    title: "Refresh Project",
+  RELOAD_PROJECT: {
+    id: "music-analyzer.reloadProject",
+    title: "Reload Project",
   },
   OPEN_COMPOSITION_EDITOR: {
     id: "music-analyzer.openCompositionEditor",
     title: "Open Composition Editor",
-  }
+  },
 };
 
 // keys

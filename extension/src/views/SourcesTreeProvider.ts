@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CompositionProjectManager } from "../managers/CompositionProjectManager";
+import { ProjectStore } from "../stores/ProjectStore";
 
 export class SourcesTreeProvider
   implements vscode.TreeDataProvider<vscode.TreeItem>
@@ -22,7 +22,7 @@ export class SourcesTreeProvider
 
     // Subscribe to project changes to refresh the tree view
     this._disposables.push(
-      CompositionProjectManager.onProjectChanged(() => {
+      ProjectStore.onProjectChanged(() => {
         this.refresh();
       })
     );
@@ -63,8 +63,8 @@ export class SourcesTreeProvider
 
   private async _getRootItems(): Promise<vscode.TreeItem[]> {
     // Get the project manager instance
-    const projectManager = CompositionProjectManager.getInstance();
-    const currentProject = projectManager.getCurrentProject();
+    const projectManager = ProjectStore.getStore();
+    const currentProject = projectManager.getProject();
 
     if (currentProject) {
       // Project is loaded

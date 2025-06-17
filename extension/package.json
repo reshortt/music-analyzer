@@ -14,11 +14,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "music-analyzer.helloVega",
-        "title": "Hello Vega",
-        "category": "Music Analyzer"
-      },
-      {
         "command": "music-analyzer.openCompositionEditor",
         "title": "Open Composition Editor",
         "category": "Music Analyzer"
@@ -31,7 +26,7 @@
       {
         "command": "music-analyzer.closeProject",
         "title": "Close Project",
-        "category": "Music Analyzer"  
+        "category": "Music Analyzer"
       }
     ],
     "viewsContainers": {
@@ -57,16 +52,16 @@
           "contextualTitle": "Music Analyzer Sources"
         }
       ]
-    }, 
-    "menus" : {
-      "view/title" : [
+    },
+    "menus": {
+      "view/title": [
         {
           "command": "music-analyzer.createProject",
-          "when" : "view == music-analyzer.projectView"
+          "when": "view == music-analyzer.projectView"
         },
         {
           "command": "music-analyzer.closeProject",
-          "when": "view == music-analyzer.projectView && music-analyzer.isProjectOpen" 
+          "when": "view == music-analyzer.projectView && music-analyzer.isProjectOpen"
         }
       ]
     }

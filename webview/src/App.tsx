@@ -1,43 +1,32 @@
 import { useState, useEffect } from "react";
-import { vscode } from "./utilities/vscode";
+import { useExtensionListener, vscode } from "./utilities/vscode";
 import "@vscode-elements/elements/dist/bundled.js";
 import "@vscode-elements/elements/dist/main.d.ts";
 import CompositionEditorPanel from "./panels/CompositionEditorPanel";
 import ProjectView from "./panels/ProjectView";
+import { EXT_MESSAGES, VIEW_TYPES } from "@music-analyzer/shared";
 
 function App() {
   const [viewType, setViewType] = useState<string>();
 
+  useExtensionListener(EXT_MESSAGES.SET_VIEW, (event) => {
+    setViewType(event.data.viewType);
+  });
+
   useEffect(() => {
-    // Listen for messages from the extension
-    const messageListener = (event: MessageEvent) => {
-      const message = event.data;
-      switch (message.command) {
-        case "setView":
-          setViewType(message.viewType);
-          break;
-      }
-    };
-
-    window.addEventListener("message", messageListener);
-
     // Send a message to the extension on load
-    vscode.postMessage({
-      command: "webviewLoaded",
-    });
-
-    return () => window.removeEventListener("message", messageListener);
+    vscode.postMessage({ command: EXT_MESSAGES.WEBVIEW_LOADED });
   }, []);
 
   if (viewType === undefined) {
     return <p>Loading...</p>;
   }
 
-  if (viewType === "compositionEditor") {
+  if (viewType === VIEW_TYPES.COMPOSITION_EDITOR) {
     return <CompositionEditorPanel />;
   }
 
-  if (viewType === "projectView") {
+  if (viewType === VIEW_TYPES.PROJECT_VIEW) {
     return <ProjectView />;
   }
 
