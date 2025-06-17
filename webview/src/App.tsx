@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useExtensionListener, vscode } from "./utilities/vscode";
-import "@vscode-elements/elements/dist/bundled.js";
-import "@vscode-elements/elements/dist/main.d.ts";
 import CompositionEditorPanel from "./panels/CompositionEditorPanel";
 import ProjectView from "./panels/ProjectView";
 import { EXT_MESSAGES, VIEW_TYPES } from "@music-analyzer/shared";

@@ -1,19 +1,18 @@
 import { SERVER_BASE_URL } from "@music-analyzer/shared";
 import { useEffect, useState } from "react";
-import { useServer } from "../layers/Server";
+import { useServer } from "../layers/ServerProvider";
 
 export function useSSE<T = any>(path: string) {
   const { token } = useServer();
 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [pending, setPending] = useState(true);
 
   useEffect(() => {
     if (!token) {
       setError("No token found");
       setData(null);
-      setLoading(false);
       return;
     }
 
@@ -31,7 +30,7 @@ export function useSSE<T = any>(path: string) {
           setError(data.message);
           setData(null);
         }
-        setLoading(false);
+        setPending(false);
       } catch (e) {
         console.error("failed to parse sse data:", e);
         setError("parse error");
@@ -42,11 +41,11 @@ export function useSSE<T = any>(path: string) {
       console.error("sse error:", event);
       setError("connection error");
       setData(null);
-      setLoading(false);
+      setPending(false);
     };
 
     return () => eventSource.close();
   }, [token, path]);
 
-  return { data, error, loading };
+  return { data, error, pending };
 }

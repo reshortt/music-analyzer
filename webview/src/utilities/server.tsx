@@ -3,7 +3,7 @@ import {
   ProjectMetadata,
   SERVER_BASE_URL,
 } from "@music-analyzer/shared";
-import { useServer } from "../layers/Server";
+import { useServer } from "../layers/ServerProvider";
 import { useSSE } from "./sse";
 
 async function callServer(path: string, body?: any, options?: RequestInit) {

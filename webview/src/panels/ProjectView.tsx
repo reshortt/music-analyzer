@@ -5,19 +5,15 @@ import { Tree } from "antd";
 import { sse } from "../utilities/server";
 
 export default function ProjectView() {
-  const { data: metadata, error, loading } = sse.useMetadata();
+  const { data: metadata, error, pending } = sse.useMetadata();
 
   useEffect(() => {
     vscode.postMessage({ command: EXT_MESSAGES.WEBVIEW_VIEW_LOADED });
   }, []);
 
-  if (loading) {
+  if (pending) {
     return <div>.....</div>;
   }
-
-  console.log("metadata", metadata);
-  console.log("error", error);
-  console.log("loading", loading);
 
   return metadata ? <YesProjectView metadata={metadata} /> : <NoProjectView />;
 }

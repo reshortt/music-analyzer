@@ -31,12 +31,12 @@ export default function CompositionEditorPanel() {
 }
 
 function PianoRoll(): React.JSX.Element {
-  const { data: patterns, error, loading } = sse.usePatterns();
+  const { data: patterns, error, pending } = sse.usePatterns();
   const sa = useServerActions();
 
   return (
     <div>
-      {loading && <div>Loading...</div>}
+      {pending && <div>Pending...</div>}
       {error && <div>Error: {error}</div>}
       {patterns &&
         patterns.map((pattern, index) => (
