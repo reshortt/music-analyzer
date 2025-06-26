@@ -9,6 +9,7 @@ import {
   showMessage,
 } from "../utilities/vs-utils";
 import type { CompositionProject } from "@music-analyzer/shared";
+import { server } from "../utilities/server";
 
 const projectEvents = new vscode.EventEmitter<{
   type: "created" | "loaded" | "closed" | "refreshed";
@@ -17,8 +18,8 @@ const projectEvents = new vscode.EventEmitter<{
 
 const PROJECT_FILE_NAME = "composition.json";
 
-class CompositionProjectManager {
-  private static _instance: CompositionProjectManager | undefined;
+class ProjectStore {
+  private static _instance: ProjectStore | undefined;
   private context: vscode.ExtensionContext;
   private currentProject: CompositionProject | undefined;
 
@@ -27,9 +28,9 @@ class CompositionProjectManager {
   public static readonly onProjectChanged = projectEvents.event;
 
   private constructor(context: vscode.ExtensionContext) {
-    if (CompositionProjectManager._instance) {
+    if (ProjectStore._instance) {
       throw new Error(
-        "CompositionProjectManager is a singleton - use getInstance() instead"
+        "ProjectStore is a singleton - use getInstance() instead"
       );
     }
 
@@ -37,20 +38,20 @@ class CompositionProjectManager {
 
     // initialize the context and listen for project open/close events
     setContext(CONTEXT.IS_PROJECT_OPEN, false);
-    CompositionProjectManager.onProjectChanged(({ project }) => {
+    ProjectStore.onProjectChanged(({ project }) => {
       setContext(CONTEXT.IS_PROJECT_OPEN, !!project);
     });
 
     // Initialize current project from workspace state if available
     const savedProject = state.savedProject.get(context);
     if (savedProject?.location) {
-      this.loadProject(path.join(savedProject.location, PROJECT_FILE_NAME));
+      this.load(path.join(savedProject.location, PROJECT_FILE_NAME));
     }
 
     // Next, try a currently open workspace
     const workspace = vscode.workspace.workspaceFolders?.[0];
     if (!this.currentProject && workspace) {
-      this.loadProject(path.join(workspace.uri.fsPath, PROJECT_FILE_NAME));
+      this.load(path.join(workspace.uri.fsPath, PROJECT_FILE_NAME));
     }
 
     // Listen for workspace folder changes
@@ -67,7 +68,7 @@ class CompositionProjectManager {
             );
 
             if (isRemoved) {
-              this.closeProject();
+              this.close();
             }
           }
         }
@@ -75,26 +76,27 @@ class CompositionProjectManager {
     );
 
     registerCommand(context, COMMANDS.CREATE_PROJECT.id, async () => {
-      await this.createProject();
+      await this.create();
     });
 
     registerCommand(context, COMMANDS.OPEN_PROJECT.id, async () => {
-      await this.openProject();
+      await this.open();
     });
 
     registerCommand(context, COMMANDS.CLOSE_PROJECT.id, () => {
-      this.closeProject();
+      this.close();
     });
 
-    registerCommand(context, COMMANDS.REFRESH_PROJECT.id, () => {
-      this.refreshProject();
+    registerCommand(context, COMMANDS.RELOAD_PROJECT.id, () => {
+      this.reload();
     });
 
     // Set the instance after successful initialization
-    CompositionProjectManager._instance = this;
+    ProjectStore._instance = this;
   }
 
-  private async createProject(): Promise<void> {
+  // create a new project, prompt user for name and location
+  private async create(): Promise<void> {
     const name = await vscode.window.showInputBox({
       prompt: "Enter project name",
       placeHolder: "My Composition Project",
@@ -137,11 +139,51 @@ class CompositionProjectManager {
     }
 
     if (location) {
-      await this.createNewProject(name, location);
+      try {
+        // Create the project directory if it doesn't exist
+        if (!fs.existsSync(location)) {
+          fs.mkdirSync(location, { recursive: true });
+        }
+
+        // Create the composition.json file
+        const compositionFilePath = path.join(location, PROJECT_FILE_NAME);
+        const compositionData = {
+          name: name,
+          created: new Date().toISOString(),
+          lastOpened: new Date().toISOString(),
+          arrangement: [],
+          renditions: [],
+        };
+
+        fs.writeFileSync(
+          compositionFilePath,
+          JSON.stringify(compositionData, null, 2)
+        );
+
+        const project: CompositionProject = {
+          name,
+          location,
+          created: compositionData.created,
+          lastOpened: new Date().toISOString(),
+          patterns: [],
+          arrangement: [],
+          renditions: [],
+        };
+
+        await this.initialize(project);
+
+        // Emit project changed event
+        projectEvents.fire({ type: "created", project: this.currentProject });
+
+        showMessage(`Project "${name}" created successfully at ${location}`);
+      } catch (error) {
+        showErrorMessage(`Failed to create project: ${error}`);
+      }
     }
   }
 
-  private async openProject(): Promise<void> {
+  // open a project, prompt user for project to open or browse for a project file
+  private async open(): Promise<void> {
     const recentProjects = state.recentProjects.get(this.context);
 
     let options: vscode.QuickPickItem[] = recentProjects.map((project) => ({
@@ -174,7 +216,7 @@ class CompositionProjectManager {
       });
 
       if (fileUri && fileUri.length > 0) {
-        await this.loadProject(fileUri[0].fsPath);
+        await this.load(fileUri[0].fsPath);
       }
     } else {
       // Find the project from recent projects
@@ -184,12 +226,25 @@ class CompositionProjectManager {
       );
       if (project) {
         const projectFilePath = path.join(project.location, PROJECT_FILE_NAME);
-        await this.loadProject(projectFilePath);
+        await this.load(projectFilePath);
       }
     }
   }
 
-  private setupProjectFileWatcher(): void {
+  // with project metadata, setup the project store
+  private async initialize(project: CompositionProject) {
+    // Set the current project
+    this.currentProject = project;
+
+    await server.loadProject(project.location, project);
+
+    // Save to workspace state
+    state.savedProject.set(this.context, this.currentProject);
+
+    // Update recent projects
+    state.recentProjects.update(this.context, this.currentProject);
+
+    // Setup file watcher
     // Remove any existing file watcher
     if (this.projectFileWatcher) {
       this.projectFileWatcher.dispose();
@@ -214,7 +269,7 @@ class CompositionProjectManager {
 
     // Listen for changes to the project file
     this.projectFileWatcher.onDidChange(() => {
-      this.refreshProject();
+      this.reload();
     });
 
     // Listen for deletion of the project file
@@ -223,69 +278,15 @@ class CompositionProjectManager {
         "The project file was deleted. The project will be closed.",
         "OK"
       );
-      this.closeProject();
+      this.close();
     });
 
     // Add to disposables
     this.context.subscriptions.push(this.projectFileWatcher);
   }
 
-  private setupProject(project: CompositionProject): void {
-    // Set the current project
-    this.currentProject = project;
-
-    // Save to workspace state
-    state.savedProject.set(this.context, this.currentProject);
-
-    // Update recent projects
-    state.recentProjects.update(this.context, this.currentProject);
-
-    // Setup file watcher
-    this.setupProjectFileWatcher();
-  }
-
-  private async createNewProject(
-    name: string,
-    location: string
-  ): Promise<void> {
-    try {
-      // Create the project directory if it doesn't exist
-      if (!fs.existsSync(location)) {
-        fs.mkdirSync(location, { recursive: true });
-      }
-
-      // Create the composition.json file
-      const compositionFilePath = path.join(location, PROJECT_FILE_NAME);
-      const compositionData = {
-        name: name,
-        created: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      };
-
-      fs.writeFileSync(
-        compositionFilePath,
-        JSON.stringify(compositionData, null, 2)
-      );
-
-      const project: CompositionProject = {
-        name,
-        location,
-        created: compositionData.created,
-        lastOpened: new Date().toISOString(),
-      };
-
-      this.setupProject(project);
-
-      // Emit project changed event
-      projectEvents.fire({ type: "created", project: this.currentProject });
-
-      showMessage(`Project "${name}" created successfully at ${location}`);
-    } catch (error) {
-      showErrorMessage(`Failed to create project: ${error}`);
-    }
-  }
-
-  private async loadProject(projectFilePath: string): Promise<void> {
+  // load an existing project from a file path
+  private async load(projectFilePath: string): Promise<void> {
     try {
       // Check if the file exists
       if (!fs.existsSync(projectFilePath)) {
@@ -311,9 +312,12 @@ class CompositionProjectManager {
         location: projectLocation,
         created: projectData.created,
         lastOpened: new Date().toISOString(),
+        patterns: [],
+        arrangement: [],
+        renditions: [],
       };
 
-      this.setupProject(project);
+      await this.initialize(project);
 
       // Update workspace to the project location
       const uri = vscode.Uri.file(projectLocation);
@@ -331,12 +335,15 @@ class CompositionProjectManager {
     }
   }
 
-  public closeProject(): void {
+  // close the current project
+  public async close(): Promise<void> {
     if (!this.currentProject) {
       return;
     }
 
     const projectName = this.currentProject.name;
+
+    await server.closeProject(this.currentProject.location);
 
     this.currentProject = undefined;
     state.savedProject.set(this.context, undefined);
@@ -351,7 +358,8 @@ class CompositionProjectManager {
     showMessage(`Project "${projectName}" closed`);
   }
 
-  public async refreshProject(): Promise<void> {
+  // reload the current project from the project file
+  public async reload(): Promise<void> {
     if (!this.currentProject) {
       return;
     }
@@ -379,29 +387,23 @@ class CompositionProjectManager {
     }
   }
 
-  public getCurrentProject(): CompositionProject | undefined {
+  public getProject(): CompositionProject | undefined {
     return this.currentProject;
   }
 
-  public static getInstance(
-    context?: vscode.ExtensionContext
-  ): CompositionProjectManager {
-    if (!CompositionProjectManager._instance) {
+  public static getStore(context?: vscode.ExtensionContext): ProjectStore {
+    if (!ProjectStore._instance) {
       if (!context) {
-        throw new Error(
-          "Context is required to initialize CompositionProjectManager"
-        );
+        throw new Error("Context is required to initialize ProjectStore");
       }
-      CompositionProjectManager._instance = new CompositionProjectManager(
-        context
-      );
+      ProjectStore._instance = new ProjectStore(context);
     }
-    return CompositionProjectManager._instance;
+    return ProjectStore._instance;
   }
 
-  public static initialize(context: vscode.ExtensionContext): void {
-    this.getInstance(context);
+  public static initializeStore(context: vscode.ExtensionContext): void {
+    this.getStore(context);
   }
 }
 
-export { CompositionProjectManager, CompositionProject };
+export { ProjectStore, CompositionProject };

@@ -1,9 +1,10 @@
 import { WebviewPanel, window, Uri, ViewColumn } from "vscode";
-import { VegaPanel } from "./VegaPanel";
+import { BasePanel } from "./BasePanel";
+import { VIEW_TYPES } from "@music-analyzer/shared";
 
-export class CompositionEditorPanel extends VegaPanel {
+export class CompositionEditorPanel extends BasePanel {
   public static currentPanel: CompositionEditorPanel | undefined;
-  private static viewType = "compositionEditor";
+  private static viewType = VIEW_TYPES.COMPOSITION_EDITOR;
   private static title = "Composition Editor";
 
   private constructor(panel: WebviewPanel, extensionUri: Uri) {

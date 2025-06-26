@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import { CompositionEditorPanel } from "./panels/CompositionEditorPanel";
-import { CompositionProjectManager } from "./managers/CompositionProjectManager";
+import { ProjectStore } from "./stores/ProjectStore";
 import { registerCommand } from "./utilities/vs-utils";
 import { ProjectViewProvider } from "./views/ProjectViewProvider";
 import { SourcesTreeProvider } from "./views/SourcesTreeProvider";
 import { COMMANDS, VIEWS } from "./constants";
 
 export function activate(context: vscode.ExtensionContext) {
-  CompositionProjectManager.initialize(context);
+  ProjectStore.initializeStore(context);
 
   // initialize the tree view
   new SourcesTreeProvider(context, VIEWS.SOURCES_TREE);

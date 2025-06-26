@@ -1,10 +1,12 @@
 import { Disposable, Webview, window, WebviewPanel, Uri } from "vscode";
 import { getHtmlForWebview } from "../utilities/webview";
+import { EXT_MESSAGES } from "@music-analyzer/shared";
+import { ProjectStore } from "../stores/ProjectStore";
 
 /**
- * Base class for all Vega panels. Uses the same react build.
+ * Base class for all panels. Uses the same react build.
  */
-export abstract class VegaPanel {
+export abstract class BasePanel {
   protected readonly _panel: WebviewPanel;
   protected readonly _extensionUri: Uri;
   protected _disposables: Disposable[] = [];
@@ -55,22 +57,19 @@ export abstract class VegaPanel {
     webview.onDidReceiveMessage(
       (message: any) => {
         const command = message.command;
-        const text = message.text;
 
         switch (command) {
-          case "hello":
-            // Code that should run in response to the hello message command
-            window.showInformationMessage(text);
-            return;
-          case "webviewLoaded":
+          case EXT_MESSAGES.WEBVIEW_LOADED:
             // React app is now loaded and ready to receive messages
             webview.postMessage({
-              command: "setView",
+              command: EXT_MESSAGES.SET_VIEW,
               viewType: this._viewType,
             });
-            return;
-          // Add more switch case statements here as more webview message commands
-          // are created within the webview context (i.e. inside media/main.js)
+            webview.postMessage({
+              command: EXT_MESSAGES.PROJECT_TOKEN,
+              token: ProjectStore.getStore().getProject()?.location,
+            });
+            break;
         }
       },
       undefined,

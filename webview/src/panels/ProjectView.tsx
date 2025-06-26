@@ -1,44 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { vscode } from "../utilities/vscode";
-import type { CompositionProject } from "@music-analyzer/shared";
+import { EXT_MESSAGES, ProjectMetadata } from "@music-analyzer/shared";
 import { Tree } from "antd";
+import { sse } from "../utilities/server";
 
 export default function ProjectView() {
-  const [project, setProject] = useState<CompositionProject | null>(null);
+  const { data: metadata, error, pending } = sse.useMetadata();
 
   useEffect(() => {
-    vscode.postMessage({ command: "webviewViewLoaded" });
+    vscode.postMessage({ command: EXT_MESSAGES.WEBVIEW_VIEW_LOADED });
   }, []);
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data && event.data.command === "projectStateChanged") {
-        setProject(event.data.payload.project);
-      }
-    };
+  if (pending) {
+    return <div>.....</div>;
+  }
 
-    window.addEventListener("message", handleMessage);
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
-
-  return project ? <YesProjectView project={project} /> : <NoProjectView />;
+  return metadata ? <YesProjectView metadata={metadata} /> : <NoProjectView />;
 }
 
-function YesProjectView(props: { project: CompositionProject }) {
-  const { project } = props;
+function YesProjectView({ metadata }: { metadata: ProjectMetadata }) {
   const treeData = [
     {
       title: (
         <span
           className="font-bold cursor-pointer"
           onClick={() => {
-            vscode.postMessage({ command: "openCompositionEditor" });
+            vscode.postMessage({
+              command: EXT_MESSAGES.OPEN_COMPOSITION_EDITOR,
+            });
           }}
         >
-          EDITOR!!
+          EDITOR
         </span>
       ),
       key: "0-0",
@@ -56,14 +48,14 @@ function NoProjectView() {
       <div className="flex flex-col gap-2">
         <vscode-button
           onClick={() => {
-            vscode.postMessage({ command: "openProject" });
+            vscode.postMessage({ command: EXT_MESSAGES.OPEN_PROJECT });
           }}
         >
           Open Project
         </vscode-button>
         <vscode-button
           onClick={() => {
-            vscode.postMessage({ command: "createNewProject" });
+            vscode.postMessage({ command: EXT_MESSAGES.CREATE_PROJECT });
           }}
         >
           Create New Project

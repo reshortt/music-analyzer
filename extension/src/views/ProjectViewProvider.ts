@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
-import { CompositionProjectManager } from "../managers/CompositionProjectManager";
+import { ProjectStore } from "../stores/ProjectStore";
 import { COMMANDS } from "../constants";
 import { getHtmlForWebview } from "../utilities/webview";
+import { EXT_MESSAGES } from "@music-analyzer/shared";
 
 export class ProjectViewProvider implements vscode.WebviewViewProvider {
   private _viewId: string;
@@ -15,7 +16,7 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
 
     // Subscribe to project changes
     this._disposables.push(
-      CompositionProjectManager.onProjectChanged(() => {
+      ProjectStore.onProjectChanged(() => {
         this._updateWebview();
       })
     );
@@ -50,23 +51,27 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage(
       async (data) => {
         switch (data.command) {
-          case "webviewLoaded":
+          case EXT_MESSAGES.WEBVIEW_LOADED:
             // Set the view type when the webview is loaded
             webviewView.webview.postMessage({
-              command: "setView",
+              command: EXT_MESSAGES.SET_VIEW,
               viewType: "projectView",
             });
+            webviewView.webview.postMessage({
+              command: EXT_MESSAGES.PROJECT_TOKEN,
+              token: ProjectStore.getStore().getProject()?.location,
+            });
             break;
-          case "webviewViewLoaded":
+          case EXT_MESSAGES.WEBVIEW_VIEW_LOADED:
             this._updateWebview();
             break;
-          case "createNewProject":
+          case EXT_MESSAGES.CREATE_PROJECT:
             vscode.commands.executeCommand(COMMANDS.CREATE_PROJECT.id);
             break;
-          case "openProject":
+          case EXT_MESSAGES.OPEN_PROJECT:
             vscode.commands.executeCommand(COMMANDS.OPEN_PROJECT.id);
             break;
-          case "openCompositionEditor":
+          case EXT_MESSAGES.OPEN_COMPOSITION_EDITOR:
             vscode.commands.executeCommand(COMMANDS.OPEN_COMPOSITION_EDITOR.id);
             break;
         }
@@ -81,14 +86,12 @@ export class ProjectViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    const projectManager = CompositionProjectManager.getInstance();
-    const currentProject = projectManager.getCurrentProject();
+    const projectManager = ProjectStore.getStore();
+    const currentProject = projectManager.getProject();
 
     this._view.webview.postMessage({
-      command: "projectStateChanged",
-      payload: {
-        project: currentProject,
-      },
+      command: EXT_MESSAGES.PROJECT_TOKEN,
+      token: ProjectStore.getStore().getProject()?.location,
     });
 
     this._view.title = currentProject?.name || "Untitled Project";

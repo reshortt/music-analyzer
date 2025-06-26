@@ -1,35 +1,8 @@
-import { useEffect, useState } from "react";
-import { vscode } from "../utilities/vscode";
-import {
-  DockviewReact,
-  DockviewApi,
-  DockviewReadyEvent,
-  DockviewPanelApi,
-} from "dockview";
+import { DockviewReact, DockviewReadyEvent } from "dockview";
 import "dockview/dist/styles/dockview.css";
+import { sse, useServerActions } from "../utilities/server";
 
 export default function CompositionEditorPanel() {
-  const [message, setMessage] = useState<string>("");
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data && event.data.command === "setView") {
-        setMessage(`View Type: ${event.data.viewType}`);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-
-    // Cleanup listener on component unmount
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
-
-  const sendMessage = () => {
-    vscode.postMessage({ command: "hello", text: "Hello from React!" });
-  };
-
   const onReady = (event: DockviewReadyEvent) => {
     event.api.addPanel({
       component: "settings",
@@ -58,7 +31,22 @@ export default function CompositionEditorPanel() {
 }
 
 function PianoRoll(): React.JSX.Element {
-  return <div> Hello Piano Roll </div>;
+  const { data: patterns, error, pending } = sse.usePatterns();
+  const sa = useServerActions();
+
+  return (
+    <div>
+      {pending && <div>Pending...</div>}
+      {error && <div>Error: {error}</div>}
+      {patterns &&
+        patterns.map((pattern, index) => (
+          <div key={JSON.stringify(pattern) + index}>
+            {JSON.stringify(pattern)}
+          </div>
+        ))}
+      <button onClick={() => sa.randomizePatterns()}>Randomize Patterns</button>
+    </div>
+  );
 }
 
 function ProjectSettings(): React.JSX.Element {
